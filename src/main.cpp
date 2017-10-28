@@ -1,9 +1,7 @@
 #include <mbed.h>
-#include <mat.h>
-#include <prism_connect.h>
-#include <dc_motor.h>
+
 #include <conf.h>
-#include <QE.h>
+
 /*
 Prism group
 software for omni robot project
@@ -11,18 +9,7 @@ start dev at 29/10/2017 (DD/MM/YYYY)
 If you develop this file , sign your name here.
 Dhamdhawach Horsuwan
 */
-Serial pc(USBTX, USBRX);
 
-dc_motor wheel1(wheel1_A_pin,wheel1_B_pin,wheel1_pwm_pin);
-dc_motor wheel2(wheel2_A_pin,wheel2_B_pin,wheel2_pwm_pin);
-dc_motor wheel3(wheel3_A_pin,wheel3_B_pin,wheel3_pwm_pin);
-
-QE wheel1_encoder (PC_3,PC_2);
-QE wheel2_encoder (PA_14,PA_13);
-QE wheel3_encoder (PC_12,PC_10);
-
-
-DigitalIn btn(USER_BUTTON);
 
 Ticker display_timer;
 void all_drive(float val){
