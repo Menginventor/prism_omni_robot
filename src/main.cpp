@@ -19,7 +19,7 @@ dc_motor wheel3(wheel3_A_pin,wheel3_B_pin,wheel3_pwm_pin);
 
 QE wheel1_encoder (PC_3,PC_2);
 QE wheel2_encoder (PA_14,PA_13);
-QE wheel3_encoder (PC_12,PC_10);
+QE wheel3_encoder ();
 
 
 DigitalIn btn(USER_BUTTON);
@@ -31,7 +31,7 @@ void all_drive(float val){
         wheel3.write(val);
 }
 void display(){
-  pc.printf("%d\t%d\t%d\n",wheel1_encoder.q_state,wheel2_encoder.q_state,wheel2_encoder.q_state);
+  pc.printf("%d\n",wheel1_encoder.q_state);
 }
 int main() {
         pc.baud(115200);
