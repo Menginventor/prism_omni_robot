@@ -20,10 +20,14 @@ void all_drive(float val){
 void display(){
   //pc.printf("%d\t%d\t%d\n",wheel1_encoder.q_state,wheel2_encoder.q_state,wheel3_encoder.q_state);
   pc.printf("%d\t%d\t%d\n",wheel1_encoder.pos,wheel2_encoder.pos,wheel3_encoder.pos);
+  wheel1_encoder.pos = 0;
+  wheel2_encoder.pos= 0;
+  wheel3_encoder.pos= 0;
+
 }
 int main() {
         pc.baud(115200);
-        display_timer.attach(&display,0.1);
+        display_timer.attach(&display,1.0/100.0);
 
 
         while(btn.read()==1) ;
