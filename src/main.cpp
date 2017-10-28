@@ -4,6 +4,13 @@
 #include <dc_motor.h>
 #include <conf.h>
 #include <QE.h>
+/*
+Prism group
+software for omni robot project
+start dev at 29/10/2017 (DD/MM/YYYY)
+If you develope this file , sign your name here.
+Dhamdhawach Horsuwan
+*/
 Serial pc(USBTX, USBRX);
 
 dc_motor wheel1(wheel1_A_pin,wheel1_B_pin,wheel1_pwm_pin);
