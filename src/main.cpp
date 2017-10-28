@@ -18,7 +18,8 @@ void all_drive(float val){
         wheel3.write(val);
 }
 void display(){
-  pc.printf("%d\t%d\t%d\n",wheel1_encoder.q_state,wheel2_encoder.q_state,wheel3_encoder.q_state);
+  //pc.printf("%d\t%d\t%d\n",wheel1_encoder.q_state,wheel2_encoder.q_state,wheel3_encoder.q_state);
+  pc.printf("%d\t%d\t%d\n",wheel1_encoder.pos,wheel2_encoder.pos,wheel3_encoder.pos);
 }
 int main() {
         pc.baud(115200);
