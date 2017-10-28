@@ -1,5 +1,6 @@
 #include <QE.h>
 void QE::get_q_state(){
+
         int pre_state = q_state;
         if(d_enA->read() == 0) {
                 if( d_enB->read() == 0) {
@@ -20,6 +21,15 @@ void QE::get_q_state(){
 
         pos += Q_state_compare(pre_state,q_state);
 
+        float period = speed_capture_timer.read();
+
+        //float period = 0.000001;
+
+        speed_capture_timer.reset();
+
+
+        if(Q_state_compare(pre_state,q_state) != 0)  speed = float(Q_state_compare(pre_state,q_state))/period;
+
 }
 QE::QE(PinName pin_A,PinName pin_B){
         /*assign pin*/
@@ -32,7 +42,7 @@ QE::QE(PinName pin_A,PinName pin_B){
         enB->rise(callback(this,&QE::get_q_state));
         enA->fall(callback(this,&QE::get_q_state));
         enB->fall(callback(this,&QE::get_q_state));
-
+        speed_capture_timer.start();
 
 }
 int QE::Q_state_compare(int pre_state,int crr_state){
