@@ -1,7 +1,7 @@
 #include <mbed.h>
-Serial*  mat_debug_port = NULL;
-class mat{
+extern Serial*  mat_debug_port;
 
+class mat{
 public:
   int row, col;
   float** mat_data = 0;

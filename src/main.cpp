@@ -46,13 +46,22 @@ void motor_test_trianglewave(){
           wait(0.01);
   }
 }
+void mat_init(){
+  mat_debug_port = &pc;
+}
 int main() {
         pc.baud(115200);
-        display_timer.attach(&display,display_period);
-
-
+        //display_timer.attach(&display,display_period);
+        mat_init();
+        mat a(3,3);
+        mat b(3,3);
+        a.set_to_I();
+        b.set_to_I();
+        printf("A = \n");
+        a.print();
+        printf("B = \n");
+        b.print();
         while(btn.read()==1) ;
-
         while(1) {
               motor_test_trianglewave();
         }

@@ -1,5 +1,5 @@
 #include <mat.h>
-
+Serial*  mat_debug_port = NULL;
 mat::mat(int _row,int _col){
         row = _row;
         col = _col;
@@ -173,7 +173,7 @@ mat mat::inverse(){
 }
 mat mat::adjoint(){
         mat result(row,col);
-      
+
         for(int i = 0; i < row; i++) { //row
                 for(int j= 0; j < col; j++) { //col
                         result.mat_data[j][i] = cofactor(i,j);
