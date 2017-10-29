@@ -21,33 +21,34 @@ void all_drive(float val){
 void display(){
         //pc.printf("%d\t%d\t%d\n",wheel1_encoder.q_state,wheel2_encoder.q_state,wheel3_encoder.q_state);
         pc.printf("%f\t%f\t%f\n",float(wheel1_encoder.pos)/display_period,float(wheel2_encoder.pos)/display_period,float(wheel3_encoder.pos)/display_period);
+/*
         wheel1_encoder.pos = 0;
         wheel2_encoder.pos= 0;
         wheel3_encoder.pos= 0;
-
+*/
 }
 void motor_test_trianglewave(){
-  for(float i = 0.0; i<1.0; i+=0.01) {
-          all_drive(i);
-          wait(0.01);
-  }
-  //wait(0.5);
-  for(float i = 1.0; i>0; i-=0.01) {
-          all_drive(i);
-          wait(0.01);
-  }
-  for(float i = 0.0; i>-1.0; i-=0.01) {
-          all_drive(i);
-          wait(0.01);
-  }
-  //wait(0.5);
-  for(float i = -1.0; i<0; i+=0.01) {
-          all_drive(i);
-          wait(0.01);
-  }
+        for(float i = 0.0; i<1.0; i+=0.01) {
+                all_drive(i);
+                wait(0.01);
+        }
+        //wait(0.5);
+        for(float i = 1.0; i>0; i-=0.01) {
+                all_drive(i);
+                wait(0.01);
+        }
+        for(float i = 0.0; i>-1.0; i-=0.01) {
+                all_drive(i);
+                wait(0.01);
+        }
+        //wait(0.5);
+        for(float i = -1.0; i<0; i+=0.01) {
+                all_drive(i);
+                wait(0.01);
+        }
 }
 void mat_init(){
-  mat_debug_port = &pc;
+        mat_debug_port = &pc;
 }
 int main() {
         pc.baud(115200);
@@ -57,13 +58,15 @@ int main() {
         mat b(3,3);
         a.set_to_I();
         b.set_to_I();
+
         printf("A = \n");
         a.print();
         printf("B = \n");
         b.print();
+
         while(btn.read()==1) ;
         while(1) {
-              motor_test_trianglewave();
+                motor_test_trianglewave();
         }
 
 }
