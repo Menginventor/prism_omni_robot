@@ -26,31 +26,35 @@ void display(){
         wheel3_encoder.pos= 0;
 
 }
+void motor_test_trianglewave(){
+  for(float i = 0.0; i<1.0; i+=0.01) {
+          all_drive(i);
+          wait(0.01);
+  }
+  //wait(0.5);
+  for(float i = 1.0; i>0; i-=0.01) {
+          all_drive(i);
+          wait(0.01);
+  }
+  for(float i = 0.0; i>-1.0; i-=0.01) {
+          all_drive(i);
+          wait(0.01);
+  }
+  //wait(0.5);
+  for(float i = -1.0; i<0; i+=0.01) {
+          all_drive(i);
+          wait(0.01);
+  }
+}
 int main() {
         pc.baud(115200);
         display_timer.attach(&display,display_period);
 
 
         while(btn.read()==1) ;
+
         while(1) {
-                for(float i = 0.0; i<1.0; i+=0.01) {
-                        all_drive(i);
-                        wait(0.01);
-                }
-                //wait(0.5);
-                for(float i = 1.0; i>0; i-=0.01) {
-                        all_drive(i);
-                        wait(0.01);
-                }
-                for(float i = 0.0; i>-1.0; i-=0.01) {
-                        all_drive(i);
-                        wait(0.01);
-                }
-                //wait(0.5);
-                for(float i = -1.0; i<0; i+=0.01) {
-                        all_drive(i);
-                        wait(0.01);
-                }
+              motor_test_trianglewave();
         }
 
 }

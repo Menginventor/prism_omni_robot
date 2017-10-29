@@ -21,18 +21,18 @@ mat::~mat(){
 
       }
       delete[] mat_data;
-      //debug->printf("deleteed!!\n");
-      //delete debug;
+      //mat_debug_port->printf("deleteed!!\n");
+      //delete mat_debug_port;
 }
 
 void mat::print(){
-        debug->printf("row = %d , col = %d\n",row,col);
+        mat_debug_port->printf("row = %d , col = %d\n",row,col);
         for(int i = 0; i < row; i++) {      //row
-                debug->printf("[");
+                mat_debug_port->printf("[");
                 for(int j= 0; j < col; j++) {      //col
-                        debug->printf("%f\t",mat_data[i][j] );
+                        mat_debug_port->printf("%f\t",mat_data[i][j] );
                 }
-                debug->printf("]\n");
+                mat_debug_port->printf("]\n");
         }
 }
 void mat::all_fill(float n){
@@ -106,14 +106,14 @@ float mat::det(){
                 return mat_data[0][0];
         }
         else{
-                //debug -> printf("more than 1 cell\n");
+                //mat_debug_port -> printf("more than 1 cell\n");
                 float result = 0;
                 for(int j = 0; j<col; j++) {
-                        //debug -> printf("j = %d val = %f\n cof = %f",j,mat_data[0][j],cofactor(this,0,j));
-                        //debug -> printf("cof [0][%d] = %f\n",j,cofactor(this,0,j));
-                        /*if(debug  != NULL){
-                           debug -> printf("aij = %f\n", mat_data[0][j]);
-                           debug -> printf("cof = %f\n", cofactor(0,j));
+                        //mat_debug_port -> printf("j = %d val = %f\n cof = %f",j,mat_data[0][j],cofactor(this,0,j));
+                        //mat_debug_port -> printf("cof [0][%d] = %f\n",j,cofactor(this,0,j));
+                        /*if(mat_debug_port  != NULL){
+                           mat_debug_port -> printf("aij = %f\n", mat_data[0][j]);
+                           mat_debug_port -> printf("cof = %f\n", cofactor(0,j));
                            }*/
                         result += mat_data[0][j]*cofactor(0,j);
                 }
@@ -146,20 +146,20 @@ float mat::minor(int _row,int _col){
                         }
                 }
         }
-        //debug->printf("mat M have row = %d col = %d\n",M->row,M->col);
-        //M->print(debug);
+        //mat_debug_port->printf("mat M have row = %d col = %d\n",M->row,M->col);
+        //M->print(mat_debug_port);
         float result = M.det();
 
         return result;
 }
 
-float mat::cofactor(int _row,int _col){//  debug->printf("call cof\n");
+float mat::cofactor(int _row,int _col){//  mat_debug_port->printf("call cof\n");
         return pow(-1,_row+ _col)*minor(_row, _col);
 
 }
 mat mat::transpose(){
         mat result(row,col);
-        result.debug = debug;
+
         for(int i = 0; i < row; i++) { //row
                 for(int j= 0; j < col; j++) { //col
                         result.mat_data[j][i] = mat_data[i][j];
@@ -173,7 +173,7 @@ mat mat::inverse(){
 }
 mat mat::adjoint(){
         mat result(row,col);
-        result.debug = debug;
+      
         for(int i = 0; i < row; i++) { //row
                 for(int j= 0; j < col; j++) { //col
                         result.mat_data[j][i] = cofactor(i,j);

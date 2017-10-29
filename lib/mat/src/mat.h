@@ -1,4 +1,5 @@
 #include <mbed.h>
+Serial*  mat_debug_port = NULL;
 class mat{
 
 public:
@@ -6,7 +7,7 @@ public:
   float** mat_data = 0;
   mat(int _row,int _col);
   ~mat();
-  Serial*  debug = NULL;
+
   void print();
   mat operator+(const mat&  other);
   mat operator+(const float&  other);
