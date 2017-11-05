@@ -28,3 +28,6 @@ QE wheel2_encoder (PA_14,PA_13);
 QE wheel3_encoder (PC_12,PC_10);
 
 DigitalIn btn(USER_BUTTON);
+
+const float robot_wheel_r = 1;//wheel radius
+const float robot_l = 1;//distant from wheel to center
