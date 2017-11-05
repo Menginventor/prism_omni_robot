@@ -15,6 +15,7 @@ public:
   mat operator+(const float&  other);
   mat operator*(const mat&  other);
   mat operator*(const float&  other);
+  void operator=(const mat&  other);
   void all_fill(float n);
   void array_copy(float *A);
   float det();

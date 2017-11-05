@@ -57,16 +57,19 @@ int main() {
         mat a(3,3);
         mat b(3,3);
         mat c(3,3);
-        a.set_to_I();
-        b.set_to_I();
+        a.all_fill(1);
+        b.all_fill(2);
 
         printf("a = \n");
         a.print();
         printf("b = \n");
         b.print();
+        c = a+b;
         printf("c = \n");
         c.print();
-
+        mat d  = a+b;
+        printf("d = \n");
+        d.print();
         while(btn.read()==1) ;
         while(1) {
                 //motor_test_trianglewave();

@@ -65,6 +65,15 @@ mat mat::operator+(const mat&  other){
         }
         return result;
 }
+void mat::operator=(const mat&  other){
+
+        for(int i = 0; i < row; i++) { //row
+                for(int j= 0; j < col; j++) { //col
+                        mat_data[i][j] = other.mat_data[i][j];
+                }
+        }
+
+}
 mat mat::operator+(const float &  other){
         mat result(row,col);
         for(int i = 0; i < row; i++) { //row
