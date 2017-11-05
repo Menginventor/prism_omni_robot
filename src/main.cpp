@@ -103,10 +103,12 @@ void reg_changing(){
   mat state_error(3,1);
   mat wheel_speed (3,1);
   mat R (3,3);
-
+  float head_error = goal_h - crr_h;
+  if(head_error >M_PI)head_error -= 2*M_PI;
+  else if(head_error < -M_PI)head_error += 2*M_PI;
   state_error.mat_data[0][0] = constrain(0.1*(goal_x - crr_x),2,-2);
   state_error.mat_data[1][0] = constrain(0.1*(goal_y - crr_y),2,-2);
-  state_error.mat_data[2][0] = constrain(0.05*(goal_h - crr_h),0.1,-0.1);
+  state_error.mat_data[2][0] = constrain(0.05*(head_error),0.1,-0.1);
 
   R.set_to_Rz(-crr_h);
 
