@@ -1,8 +1,10 @@
 #include <mbed.h>
 extern Serial*  mat_debug_port;
 
+//Serial*  mat_debug_port = NULL;
 class mat{
 public:
+  unsigned int mat_id = 0;
   int row, col;
   float** mat_data = 0;
   mat(int _row,int _col);

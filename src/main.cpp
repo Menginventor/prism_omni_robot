@@ -21,11 +21,11 @@ void all_drive(float val){
 void display(){
         //pc.printf("%d\t%d\t%d\n",wheel1_encoder.q_state,wheel2_encoder.q_state,wheel3_encoder.q_state);
         pc.printf("%f\t%f\t%f\n",float(wheel1_encoder.pos)/display_period,float(wheel2_encoder.pos)/display_period,float(wheel3_encoder.pos)/display_period);
-/*
+
         wheel1_encoder.pos = 0;
         wheel2_encoder.pos= 0;
         wheel3_encoder.pos= 0;
-*/
+
 }
 void motor_test_trianglewave(){
         for(float i = 0.0; i<1.0; i+=0.01) {
@@ -56,17 +56,20 @@ int main() {
         mat_init();
         mat a(3,3);
         mat b(3,3);
+        mat c(3,3);
         a.set_to_I();
         b.set_to_I();
 
-        printf("A = \n");
+        printf("a = \n");
         a.print();
-        printf("B = \n");
+        printf("b = \n");
         b.print();
+        printf("c = \n");
+        c.print();
 
         while(btn.read()==1) ;
         while(1) {
-                motor_test_trianglewave();
+                //motor_test_trianglewave();
         }
 
 }

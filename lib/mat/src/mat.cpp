@@ -1,6 +1,9 @@
 #include <mat.h>
 Serial*  mat_debug_port = NULL;
+unsigned int mat_crr_id = 0;
 mat::mat(int _row,int _col){
+        mat_id = mat_crr_id;
+        mat_crr_id++;
         row = _row;
         col = _col;
         mat_data = new float*[row];
@@ -26,7 +29,7 @@ mat::~mat(){
 }
 
 void mat::print(){
-        mat_debug_port->printf("row = %d , col = %d\n",row,col);
+        mat_debug_port->printf("id = %d , row = %d , col = %d\n",mat_id,row,col);
         for(int i = 0; i < row; i++) {      //row
                 mat_debug_port->printf("[");
                 for(int j= 0; j < col; j++) {      //col
