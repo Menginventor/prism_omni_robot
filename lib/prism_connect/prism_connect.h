@@ -4,7 +4,7 @@
 #define write_instruction_code 0x03
 #define data_len_byte 2
 #define instruction_byte 3
-
+#define reg_size  64
 
 class prism_connect{
 
@@ -13,12 +13,15 @@ public:
 
 //**:Variable:**//
 
-  unsigned char data_reg [64];//data register to store ,read and send.
+  unsigned char data_reg [reg_size];//data register to store ,read and send.
 
 
 
 
   /*Serial comunication*/
+  DigitalOut* led_status = NULL;
+  void led_status_off();
+  Timeout led_status_timeout;
   Serial*  serial_port ;
   int serial_buad ;
   unsigned char serial_buf[128];//serial buffer refer to max packet length

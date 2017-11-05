@@ -25,6 +25,7 @@ prism_connect::~prism_connect(){
 void prism_connect::Rx_interrupt(){
         static unsigned char packet_len = 0;
         unsigned char data_in = serial_port->getc();
+        if(serial_buf_index>reg_size)  serial_buf_index = 0;
         if(!receiving) {  //first receiving
                 serial_buf_index = 0;
                 serial_data_sum = 0;
@@ -100,7 +101,15 @@ bool prism_connect::processing_packet(){
                 /*for(int i = 0; i<serial_buf[5]; i+=4) {
                       serial_port->printf("read  reg [%d] = %f , ",i+serial_buf[4], read_float_reg(i+serial_buf[4]));
                    }*/
-                if(reg_update != NULL)reg_update();
+                if(reg_update != NULL){
+                  reg_update();
+                  if(led_status != NULL){
+                    led_status->write(1);
+                    led_status_timeout.  attach(callback(this,&prism_connect::led_status_off),0.1);
+
+
+                  }
+                }
                 send_return_packet(0,serial_buf[4],serial_buf[5]);
 
         }
@@ -162,4 +171,10 @@ void prism_connect::send_return_packet(unsigned char status,unsigned char addr,u
 
 unsigned char prism_connect::read_byte_reg(unsigned char addr){
       return data_reg[addr];
+}
+void prism_connect::led_status_off(){
+  if(led_status != NULL){
+      led_status->write(0);
+
+  }
 }

@@ -33,6 +33,7 @@ float constrain(float val,float upper_lim,float under_lim){
  }
 void reg_changing();
 prism_connect prism_comport (&pc,115200,&reg_changing);
+
 Ticker display_timer;
 float display_period = 1.0/100.0;
 void all_drive(float val){
@@ -73,6 +74,7 @@ void mat_init(){
         mat_debug_port = &pc;
 }
 int main() {
+        prism_comport.led_status = &LED;
         pc.baud(115200);
         //display_timer.attach(&display,display_period);
         mat_init();
