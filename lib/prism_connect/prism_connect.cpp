@@ -25,7 +25,7 @@ prism_connect::~prism_connect(){
 void prism_connect::Rx_interrupt(){
         static unsigned char packet_len = 0;
         unsigned char data_in = serial_port->getc();
-        if(serial_buf_index>reg_size)  serial_buf_index = 0;
+        if(serial_buf_index>serial_buf_size)  serial_buf_index = 0;
         if(!receiving) {  //first receiving
                 serial_buf_index = 0;
                 serial_data_sum = 0;
