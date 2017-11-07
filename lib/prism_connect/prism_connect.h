@@ -5,7 +5,7 @@
 #define data_len_byte 2
 #define instruction_byte 3
 #define reg_size  64
-
+#define serial_buf_size 128
 class prism_connect{
 
 
