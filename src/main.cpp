@@ -88,7 +88,7 @@ mat state_dot(mat& _crr_state){
 void state_update(){
 
       //  crr_state = crr_state+state_dot(crr_state)*float(1.0/100.0);
-      crr_state = euler(crr_state,&state_dot,float(1.0/100.0));
+      crr_state = RK4(crr_state,&state_dot,float(1.0/100.0));
 }
 int main() {
         prism_comport.led_status = &LED;
