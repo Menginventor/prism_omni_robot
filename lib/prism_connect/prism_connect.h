@@ -37,6 +37,7 @@ unsigned char data_reg [reg_size];  //data register to store ,read and send.
 
 
 /*Serial comunication*/
+Serial* debug;
 DigitalOut* led_status = NULL;
 void led_status_off();
 Timeout led_status_timeout;

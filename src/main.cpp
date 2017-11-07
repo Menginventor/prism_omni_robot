@@ -32,6 +32,8 @@ prism_connect prism_comport (&pc,115200,&reg_changing);
 
 Ticker display_timer;
 Ticker state_update_timer;
+Timer debug_timer;
+bool check_requesting = false;
 float display_period = 1.0/100.0;
 void all_drive(float val){
         wheel1.write(val);
@@ -39,12 +41,7 @@ void all_drive(float val){
         wheel3.write(val);
 }
 void display(){
-        //pc.printf("%d\t%d\t%d\n",wheel1_encoder.q_state,wheel2_encoder.q_state,wheel3_encoder.q_state);
-        pc.printf("%f\t%f\t%f\n",float(wheel1_encoder.pos)/display_period,float(wheel2_encoder.pos)/display_period,float(wheel3_encoder.pos)/display_period);
-
-        wheel1_encoder.pos = 0;
-        wheel2_encoder.pos= 0;
-        wheel3_encoder.pos= 0;
+  crr_state.print();
 
 }
 void motor_test_trianglewave(){
@@ -68,7 +65,7 @@ void motor_test_trianglewave(){
         }
 }
 void mat_init(){
-        mat_debug_port = &pc;
+        mat_debug_port = &debug_port;
 }
 
 mat state_dot(mat& _crr_state){
@@ -88,15 +85,24 @@ mat state_dot(mat& _crr_state){
 void state_update(){
 
       //  crr_state = crr_state+state_dot(crr_state)*float(1.0/100.0);
-      crr_state = RK4(crr_state,&state_dot,float(1.0/100.0));
+      debug_timer.reset();
+      debug_timer.start();
+      crr_state = RK4(crr_state,&state_dot,float(1.0/100.0));//take 700 uS
+      //debug_port.printf("%d\n",debug_timer.read_us() );
+      check_requesting = true;
 }
 int main() {
         prism_comport.led_status = &LED;
+        prism_comport.debug = &debug_port;
         pc.baud(115200);
-        //display_timer.attach(&display,display_period);
+
+        debug_port.baud(115200);
+        debug_port.printf("Hello debug_port\n");
+
+        display_timer.attach(&display,0.5);
         prism_comport.write_float_reg(p1_addr,100.0);
         prism_comport.write_float_reg(p2_addr,0.0);
-        prism_comport.write_float_reg(p3_addr,-100.0);
+        prism_comport.write_float_reg(p3_addr,-95.0);
         state_update_timer.attach(&state_update,1.0/100.0);
         mat_init();
         while(btn.read()==1) ;
@@ -106,6 +112,9 @@ int main() {
 
 }
 void reg_changing(){
+        //debug_port.printf("check_requesting = %d\n",check_requesting );
+        //check_requesting = false;
+        //while (!check_requesting) ;
         prism_comport.write_float_reg(crr_x_addr,crr_state.mat_data[0][0]); //p1
         prism_comport.write_float_reg(crr_y_addr,crr_state.mat_data[1][0]); //p2
         prism_comport.write_float_reg(crr_h_addr,crr_state.mat_data[2][0]); //p3

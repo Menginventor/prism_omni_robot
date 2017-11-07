@@ -19,7 +19,7 @@
 #define wheel3_B_pin PA_9
 
 Serial pc(USBTX, USBRX);
-
+Serial debug_port(PC_6, PA_12);
 dc_motor wheel1(wheel1_A_pin,wheel1_B_pin,wheel1_pwm_pin);
 dc_motor wheel2(wheel2_A_pin,wheel2_B_pin,wheel2_pwm_pin);
 dc_motor wheel3(wheel3_A_pin,wheel3_B_pin,wheel3_pwm_pin);

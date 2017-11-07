@@ -12,8 +12,10 @@ mat euler(mat& crr_state,mat (*state_dot)(mat&),float h){
         next_state = crr_state+state_dot(crr_state)*h;
         return next_state;
 }
+
 mat RK4(mat& crr_state,mat (*state_dot)(mat&),float h){
 //  crr_state = crr_state+state_dot(crr_state)*float(1.0/100.0);
+
         mat K1 (crr_state.row,crr_state.col);
         mat K2 (crr_state.row,crr_state.col);
         mat K3 (crr_state.row,crr_state.col);
@@ -29,5 +31,6 @@ mat RK4(mat& crr_state,mat (*state_dot)(mat&),float h){
 
         mat next_state (crr_state.row,crr_state.col);
         next_state = crr_state+(K1+(K2*2)+(K3*2)+K4)*(h/6.0);
+
         return next_state;
 }
