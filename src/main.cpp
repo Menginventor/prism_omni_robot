@@ -25,6 +25,54 @@ mat omni_mat_init(){
          omni.mat_data[2][2] = -robot_l;
          return omni;
  }
+
+ mat omni = omni_mat_init();
+
+ float h = 0.001;
+ mat mat_R2(float theta);
+ mat omni_kinemetic(mat wheel_speed);
+ mat g_state_dot(mat g_state, mat relative_state);
+ mat runge(mat g_state, mat relative_state);
+
+ mat mat_R2(float theta){
+   float _cos = cos(theta);
+  float _sin = sin(theta);
+  float R2_arr[2][2] = {{_cos, -_sin}, {_sin, _cos}};
+  mat R2(2,2);
+  R2.array_copy(&R2_arr[0][0]);
+  return R2;
+}
+
+mat omni_kinemetic(mat wheel_speed){
+  mat result = omni.inverse() * (wheel_speed * robot_wheel_r);
+  return result;
+}
+
+mat g_state_dot(mat _g_state, mat _relative_state){
+
+  mat r_pos_dot(2,1);
+  r_pos_dot.mat_data[0][0] = _relative_state.mat_data[0][0];
+  r_pos_dot.mat_data[1][0] = _relative_state.mat_data[1][0];
+  mat g_pos_dot =   mat_R2(_g_state.mat_data[2][0]) * r_pos_dot;
+
+  mat result(3,1);
+
+  result.mat_data[0][0] = g_pos_dot.mat_data[0][0];
+  result.mat_data[1][0] = g_pos_dot.mat_data[1][0];
+  result.mat_data[2][0] = _relative_state.mat_data[2][0];
+
+  return result;
+}
+
+mat runge(mat _g_state, mat _relative_state){
+  mat K1 = g_state_dot(_g_state,_relative_state);
+  mat K2 = g_state_dot(_g_state + (K1 * (h/2.0)),_relative_state);
+  mat K3 = g_state_dot(_g_state + (K2 * (h/2.0)),_relative_state);
+  mat K4 = g_state_dot(_g_state + (K3 * h),_relative_state);
+  mat result = _g_state + ((K1 + (K2 * 2.0) + (K3 * 2.0) + K4) * (h/6.0));
+  return result;
+}
+
 float constrain(float val,float upper_lim,float under_lim){
          if (val > upper_lim) return upper_lim;
          else if (val < under_lim) return under_lim;
@@ -117,5 +165,15 @@ void reg_changing(){
   prism_comport.write_float_reg(25,wheel_speed.mat_data[0][0]);   //p1
   prism_comport.write_float_reg(29,wheel_speed.mat_data[1][0]);   //p2
   prism_comport.write_float_reg(33,wheel_speed.mat_data[2][0]);   //p3
+  mat g_state(3,1);
+  g_state.mat_data[0][0] = crr_x;
+  g_state.mat_data[1][0] = crr_y;
+  g_state.mat_data[2][0] = crr_h;
+  mat relative_state_dot = omni_kinemetic(wheel_speed);
+  mat new_state = runge(g_state,relative_state_dot);
+  prism_comport.write_float_reg(1,wheel_speed.mat_data[0][0]);   //x
+  prism_comport.write_float_reg(5,wheel_speed.mat_data[1][0]);   //y
+  prism_comport.write_float_reg(9,wheel_speed.mat_data[2][0]);   //theta
+
 
 }
