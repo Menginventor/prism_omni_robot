@@ -4,6 +4,7 @@
 #include <prism_connect.h>
 #include <dc_motor.h>
 #include <QE.h>
+#include <my_math.h>
 /*use for robot configure*/
 #define wheel1_pwm_pin PB_13
 #define wheel1_A_pin PB_14

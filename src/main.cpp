@@ -26,12 +26,7 @@ mat omni_mat_init(){
         omni.mat_data[2][2] = -robot_l;
         return omni;
 }
-float constrain(float val,float upper_lim,float under_lim){
-        if (val > upper_lim) return upper_lim;
-        else if (val < under_lim) return under_lim;
-        else return val;
 
-}
 void reg_changing();
 prism_connect prism_comport (&pc,115200,&reg_changing);
 
@@ -76,19 +71,24 @@ void mat_init(){
         mat_debug_port = &pc;
 }
 
+mat state_dot(mat& _crr_state){
+        static mat mat_omni_inv = omni_mat_init().inverse();
+        mat crr_state_dot (3,1);
+        mat wheel_speed (3,1);
+        wheel_speed.mat_data[0][0] = prism_comport.read_float_reg(p1_addr);
+        wheel_speed.mat_data[1][0] = prism_comport.read_float_reg(p2_addr);
+        wheel_speed.mat_data[2][0] = prism_comport.read_float_reg(p3_addr);
+        mat R (3,3);
+        R.set_to_Rz(_crr_state.mat_data[2][0]);
+
+        crr_state_dot = (R*mat_omni_inv)*(wheel_speed*robot_wheel_r);
+        return crr_state_dot;
+}
+
 void state_update(){
-  static mat mat_omni_inv = omni_mat_init().inverse();
-      mat crr_state_dot (3,1);
-      mat wheel_speed (3,1);
-      wheel_speed.mat_data[0][0] = prism_comport.read_float_reg(p1_addr);
-      wheel_speed.mat_data[1][0] = prism_comport.read_float_reg(p2_addr);
-      wheel_speed.mat_data[2][0] = prism_comport.read_float_reg(p3_addr);
-      mat R (3,3);
-      R.set_to_Rz(crr_state.mat_data[2][0]);
 
-      crr_state_dot = (R*mat_omni_inv)*(wheel_speed*robot_wheel_r);
-      crr_state = crr_state+crr_state_dot*float(1.0/100.0);
-
+      //  crr_state = crr_state+state_dot(crr_state)*float(1.0/100.0);
+      crr_state = euler(crr_state,&state_dot,float(1.0/100.0));
 }
 int main() {
         prism_comport.led_status = &LED;
@@ -106,14 +106,14 @@ int main() {
 
 }
 void reg_changing(){
-  prism_comport.write_float_reg(crr_x_addr,crr_state.mat_data[0][0]); //p1
-  prism_comport.write_float_reg(crr_y_addr,crr_state.mat_data[1][0]); //p2
-  prism_comport.write_float_reg(crr_h_addr,crr_state.mat_data[2][0]); //p3
-  /*
-        prism_comport.write_float_reg(crr_x_addr,prism_comport.read_float_reg(goal_x_addr )); //p1
-        prism_comport.write_float_reg(crr_y_addr,prism_comport.read_float_reg(goal_y_addr )); //p2
-        prism_comport.write_float_reg(crr_h_addr,prism_comport.read_float_reg(goal_h_addr )); //p3
-      */
+        prism_comport.write_float_reg(crr_x_addr,crr_state.mat_data[0][0]); //p1
+        prism_comport.write_float_reg(crr_y_addr,crr_state.mat_data[1][0]); //p2
+        prism_comport.write_float_reg(crr_h_addr,crr_state.mat_data[2][0]); //p3
+        /*
+              prism_comport.write_float_reg(crr_x_addr,prism_comport.read_float_reg(goal_x_addr )); //p1
+              prism_comport.write_float_reg(crr_y_addr,prism_comport.read_float_reg(goal_y_addr )); //p2
+              prism_comport.write_float_reg(crr_h_addr,prism_comport.read_float_reg(goal_h_addr )); //p3
+         */
         /*
            static mat omni = omni_mat_init();
            if(prism_comport.read_byte_reg(0)==0) {
