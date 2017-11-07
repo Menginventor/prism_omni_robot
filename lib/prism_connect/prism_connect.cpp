@@ -15,7 +15,8 @@ prism_connect::prism_connect(Serial* port,int _buad,void (*f)()){
 
         serial_buad =  _buad;
         time_char = 10.0/float(serial_buad);//10 from 8 databits 1 start bit,1 stopbit.
-        serial_timeout = 3.0*time_char;
+        //serial_timeout = 3.0*time_char;
+        serial_timeout = 0.100;
         serial_port->attach(callback(this,&prism_connect::Rx_interrupt), Serial::RxIrq);
         reg_update = f;
 }
