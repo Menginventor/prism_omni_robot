@@ -78,8 +78,11 @@ void prism_connect::Rx_interrupt(){
 void prism_connect::packet_terminate(){
         receiving = false;
         if(!processing_packet()) {
-                if(debug != NULL)debug -> printf("processing_packet error!\n");
+                if(debug != NULL)debug -> printf("Packet error!\n");
                 send_return_packet(1,0,0);
+        }
+        else{
+          if(debug != NULL)debug -> printf("Packet OK!\n");
         }
 }
 

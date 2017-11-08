@@ -42,14 +42,14 @@ void all_drive(float val){
 }
 void display(){
   //crr_state.print();
-  debug_port.printf("%d\n",prism_comport.serial_buf_index );
-
+//  debug_port.printf("%d\n",prism_comport.serial_buf_index );
+/*
   debug_port.printf("data in buffer \n");
   for (int i = 0;i<prism_comport.serial_buf_index;i++ ){
     debug_port.printf("%02x " ,prism_comport.serial_buf[i]);
   }
-
-  debug_port.printf("\n");
+*/
+//  debug_port.printf("\n");
 }
 void motor_test_trianglewave(){
         for(float i = 0.0; i<1.0; i+=0.01) {
