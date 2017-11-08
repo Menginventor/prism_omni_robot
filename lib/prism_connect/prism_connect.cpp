@@ -16,7 +16,7 @@ prism_connect::prism_connect(Serial* port,int _buad,void (*f)()){
         serial_buad =  _buad;
         time_char = 10.0/float(serial_buad);//10 from 8 databits 1 start bit,1 stopbit.
         //serial_timeout = 3.0*time_char;
-        serial_timeout = 0.10;
+        serial_timeout = 0.010;
         serial_port->attach(callback(this,&prism_connect::Rx_interrupt), Serial::RxIrq);
         reg_update = f;
 }
@@ -27,9 +27,10 @@ void prism_connect::Rx_interrupt(){
 
         static unsigned char packet_len = 0;
         unsigned char data_in = serial_port->getc();
-        if(serial_buf_index>serial_buf_size)  serial_buf_index = 0;
+        //debug -> printf("%02x " ,data_in);
+        if(serial_buf_index>serial_buf_size&&debug != NULL)  serial_buf_index = 0;
         if(!receiving) {  //first receiving
-                  //if(debug != NULL)debug -> printf("start rx serial!\n");
+                //  if(debug != NULL)debug -> printf(".");
                 serial_buf_index = 0;
                 serial_data_sum = 0;
 
@@ -45,19 +46,23 @@ void prism_connect::Rx_interrupt(){
         serial_buf[serial_buf_index] = data_in;
 
 
-        if(serial_buf_index == 1 && serial_buf[1] != 0xFF) {
+        if(serial_buf_index >= 1 && serial_buf[0] != 0xFF && serial_buf[1] != 0xFF) {
                 receiving = false;
                 return;
         }
 
         if(serial_buf_index == 2 ) {
                 packet_len = serial_buf[2];
+                if(serial_buf[2] == 0xFF){
+                    receiving = false;
+                  return;
+                }
         }
 
         if(serial_buf_index >= 2 &&  serial_buf_index < packet_len + 2) {
                 serial_data_sum += serial_buf[serial_buf_index];
         }
-        else if (serial_buf_index == packet_len + 2) {
+        else if (serial_buf_index >= 2 &&  serial_buf_index >= packet_len + 2) {
                 //serial_port->putc(serial_buf[serial_buf_index]);
 
                 serial_buf_index++;

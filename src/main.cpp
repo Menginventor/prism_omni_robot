@@ -41,8 +41,15 @@ void all_drive(float val){
         wheel3.write(val);
 }
 void display(){
-  crr_state.print();
+  //crr_state.print();
+  debug_port.printf("%d\n",prism_comport.serial_buf_index );
 
+  debug_port.printf("data in buffer \n");
+  for (int i = 0;i<prism_comport.serial_buf_index;i++ ){
+    debug_port.printf("%02x " ,prism_comport.serial_buf[i]);
+  }
+
+  debug_port.printf("\n");
 }
 void motor_test_trianglewave(){
         for(float i = 0.0; i<1.0; i+=0.01) {
@@ -88,13 +95,14 @@ void state_update(){
       debug_timer.reset();
       debug_timer.start();
       crr_state = RK4(crr_state,&state_dot,float(1.0/100.0));//take 700 uS
+      //crr_state = euler(crr_state,&state_dot,float(1.0/100.0));
       //debug_port.printf("%d\n",debug_timer.read_us() );
       check_requesting = true;
 }
 int main() {
         prism_comport.led_status = &LED;
         prism_comport.debug = &debug_port;
-        pc.baud(115200);
+        pc.baud(9600);
 
         debug_port.baud(115200);
         debug_port.printf("Hello debug_port\n");
@@ -103,7 +111,7 @@ int main() {
         prism_comport.write_float_reg(p1_addr,100.0);
         prism_comport.write_float_reg(p2_addr,0.0);
         prism_comport.write_float_reg(p3_addr,-95.0);
-        state_update_timer.attach(&state_update,1.0/100.0);
+        state_update_timer.attach(&state_update,0.01);
         mat_init();
         while(btn.read()==1) ;
         while(1) {
