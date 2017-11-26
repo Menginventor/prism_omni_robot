@@ -28,7 +28,7 @@ void prism_connect::Rx_interrupt(){
         static unsigned char packet_len = 0;
         unsigned char data_in = serial_port->getc();
         //debug -> printf("%02x " ,data_in);
-        if(serial_buf_index>serial_buf_size&&debug != NULL)  serial_buf_index = 0;
+        if(serial_buf_index>serial_buf_size)  serial_buf_index = 0;
         if(!receiving) {  //first receiving
                 //  if(debug != NULL)debug -> printf(".");
                 serial_buf_index = 0;
@@ -46,7 +46,7 @@ void prism_connect::Rx_interrupt(){
         serial_buf[serial_buf_index] = data_in;
 
 
-        if(serial_buf_index >= 1 && serial_buf[0] != 0xFF && serial_buf[1] != 0xFF) {
+        if(serial_buf_index >= 1 && (serial_buf[0] != 0xFF || serial_buf[1] != 0xFF)) {
                 receiving = false;
                 return;
         }
@@ -79,7 +79,7 @@ void prism_connect::packet_terminate(){
         receiving = false;
         if(!processing_packet()) {
                 if(debug != NULL)debug -> printf("Packet error!\n");
-                send_return_packet(1,0,0);
+                //send_return_packet(1,0,0);
         }
         else{
           if(debug != NULL)debug -> printf("Packet OK!\n");
@@ -94,11 +94,13 @@ bool prism_connect::processing_packet(){
          */
         if(!(serial_buf[0] == 0xFF && serial_buf[1] == 0xFF)) {  //check header
             if(debug != NULL)debug -> printf("processing_packet header error!\n");
+            send_return_packet(1,0,0);
                 return false;
         }
         serial_data_sum = ~serial_data_sum;
         if(serial_buf[datalength-1] != serial_data_sum) {  //check sum
             if(debug != NULL)debug -> printf("processing_packet checksum error!\n");
+            send_return_packet(2,0,0);
                 //serial_port->printf("checksum error\n");
                 return false;
         }

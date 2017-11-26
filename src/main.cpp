@@ -94,6 +94,7 @@ void state_update(){
       //  crr_state = crr_state+state_dot(crr_state)*float(1.0/100.0);
       debug_timer.reset();
       debug_timer.start();
+
       crr_state = RK4(crr_state,&state_dot,float(1.0/100.0));//take 700 uS
       //crr_state = euler(crr_state,&state_dot,float(1.0/100.0));
       //debug_port.printf("%d\n",debug_timer.read_us() );
