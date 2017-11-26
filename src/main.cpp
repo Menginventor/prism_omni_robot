@@ -94,6 +94,33 @@ void state_update(){
       //  crr_state = crr_state+state_dot(crr_state)*float(1.0/100.0);
       debug_timer.reset();
       debug_timer.start();
+      static mat omni = omni_mat_init();
+
+      float crr_x = prism_comport.read_float_reg(1);
+      float crr_y = prism_comport.read_float_reg(5);
+      float crr_h = prism_comport.read_float_reg(9);
+
+      float goal_x = prism_comport.read_float_reg(13);
+      float goal_y = prism_comport.read_float_reg(17);
+      float goal_h = prism_comport.read_float_reg(21);
+
+      mat state_error(3,1);
+      mat wheel_speed (3,1);
+      mat R (3,3);
+      float head_error = goal_h - crr_h;
+      while(head_error >M_PI)head_error -= 2*M_PI;
+      while(head_error < -M_PI)head_error += 2*M_PI;
+      state_error.mat_data[0][0] = constrain(10.0*(goal_x - crr_x),200,-200);
+      state_error.mat_data[1][0] = constrain(10.0*(goal_y - crr_y),200,-200);
+      state_error.mat_data[2][0] = constrain(2*(head_error),2,-2);
+
+      R.set_to_Rz(-crr_h);
+
+      wheel_speed = (omni*R)*state_error;
+
+      prism_comport.write_float_reg(25,wheel_speed.mat_data[0][0]);   //p1
+      prism_comport.write_float_reg(29,wheel_speed.mat_data[1][0]);   //p2
+      prism_comport.write_float_reg(33,wheel_speed.mat_data[2][0]);   //p3
 
       crr_state = RK4(crr_state,&state_dot,float(1.0/100.0));//take 700 uS
       //crr_state = euler(crr_state,&state_dot,float(1.0/100.0));
