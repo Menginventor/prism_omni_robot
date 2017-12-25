@@ -123,7 +123,6 @@ void state_update(){
       prism_comport.write_float_reg(33,wheel_speed.mat_data[2][0]);   //p3
 
       crr_state = RK4(crr_state,&state_dot,float(1.0/100.0));//take 700 uS
-      crr_state.mat_data[2][0] = atan2(sin(crr_state.mat_data[2][0]),cos(crr_state.mat_data[2][0]));
       //crr_state = euler(crr_state,&state_dot,float(1.0/100.0));
       //debug_port.printf("%d\n",debug_timer.read_us() );
       check_requesting = true;
