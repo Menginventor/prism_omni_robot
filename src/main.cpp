@@ -104,9 +104,9 @@ void state_update(){
       float goal_y = prism_comport.read_float_reg(17);
       float goal_h = prism_comport.read_float_reg(21);
 
-      static mat state_error(3,1);
-      static mat wheel_speed (3,1);
-      static mat R (3,3);
+      mat state_error(3,1);
+      mat wheel_speed (3,1);
+      mat R (3,3);
       float head_error = goal_h - crr_h;
       while(head_error >M_PI)head_error -= 2*M_PI;
       while(head_error < -M_PI)head_error += 2*M_PI;
