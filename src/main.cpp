@@ -104,9 +104,9 @@ void state_update(){
       float goal_y = prism_comport.read_float_reg(17);
       float goal_h = prism_comport.read_float_reg(21);
 
-      mat state_error(3,1);
-      mat wheel_speed (3,1);
-      mat R (3,3);
+      static mat state_error(3,1);
+      static mat wheel_speed (3,1);
+      static mat R (3,3);
       float head_error = goal_h - crr_h;
       while(head_error >M_PI)head_error -= 2*M_PI;
       while(head_error < -M_PI)head_error += 2*M_PI;
@@ -123,6 +123,7 @@ void state_update(){
       prism_comport.write_float_reg(33,wheel_speed.mat_data[2][0]);   //p3
 
       crr_state = RK4(crr_state,&state_dot,float(1.0/100.0));//take 700 uS
+      crr_state.mat_data[2][0] = atan2(sin(crr_state.mat_data[2][0]),cos(crr_state.mat_data[2][0]));
       //crr_state = euler(crr_state,&state_dot,float(1.0/100.0));
       //debug_port.printf("%d\n",debug_timer.read_us() );
       check_requesting = true;
