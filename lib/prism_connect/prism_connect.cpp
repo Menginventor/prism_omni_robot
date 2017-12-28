@@ -16,7 +16,7 @@ prism_connect::prism_connect(Serial* port,int _buad,void (*f)()){
         serial_buad =  _buad;
         time_char = 10.0/float(serial_buad);//10 from 8 databits 1 start bit,1 stopbit.
         //serial_timeout = 3.0*time_char;
-        serial_timeout = 0.100;
+        serial_timeout = 0.010;
         serial_port->attach(callback(this,&prism_connect::Rx_interrupt), Serial::RxIrq);
         reg_update = f;
 }
@@ -24,10 +24,13 @@ prism_connect::~prism_connect(){
         delete serial_port;
 }
 void prism_connect::Rx_interrupt(){
+
         static unsigned char packet_len = 0;
         unsigned char data_in = serial_port->getc();
+        //debug -> printf("%02x " ,data_in);
         if(serial_buf_index>serial_buf_size)  serial_buf_index = 0;
         if(!receiving) {  //first receiving
+                //  if(debug != NULL)debug -> printf(".");
                 serial_buf_index = 0;
                 serial_data_sum = 0;
 
@@ -43,19 +46,23 @@ void prism_connect::Rx_interrupt(){
         serial_buf[serial_buf_index] = data_in;
 
 
-        if(serial_buf_index == 1 && serial_buf[1] != 0xFF) {
+        if(serial_buf_index >= 1 && (serial_buf[0] != 0xFF || serial_buf[1] != 0xFF)) {
                 receiving = false;
                 return;
         }
 
         if(serial_buf_index == 2 ) {
                 packet_len = serial_buf[2];
+                if(serial_buf[2] == 0xFF){
+                    receiving = false;
+                  return;
+                }
         }
 
         if(serial_buf_index >= 2 &&  serial_buf_index < packet_len + 2) {
                 serial_data_sum += serial_buf[serial_buf_index];
         }
-        else if (serial_buf_index == packet_len + 2) {
+        else if (serial_buf_index >= 2 &&  serial_buf_index >= packet_len + 2) {
                 //serial_port->putc(serial_buf[serial_buf_index]);
 
                 serial_buf_index++;
@@ -71,8 +78,11 @@ void prism_connect::Rx_interrupt(){
 void prism_connect::packet_terminate(){
         receiving = false;
         if(!processing_packet()) {
-                //serial_port->printf("error , ");
-                send_return_packet(1,0,0);
+                if(debug != NULL)debug -> printf("Packet error!\n");
+                //send_return_packet(1,0,0);
+        }
+        else{
+          if(debug != NULL)debug -> printf("Packet OK!\n");
         }
 }
 
@@ -82,11 +92,15 @@ bool prism_connect::processing_packet(){
                0     1      2         3           4           3+N       4+N
             [0xFF][0xFF][Length][Instruction]	[PARAM 1]... [PARAM N][Checksum]
          */
-        if(!(serial_buf[0] == 0xFF && serial_buf[1] == 0xFF)) {  //check hrad
+        if(!(serial_buf[0] == 0xFF && serial_buf[1] == 0xFF)) {  //check header
+            if(debug != NULL)debug -> printf("processing_packet header error!\n");
+            send_return_packet(1,0,0);
                 return false;
         }
         serial_data_sum = ~serial_data_sum;
         if(serial_buf[datalength-1] != serial_data_sum) {  //check sum
+            if(debug != NULL)debug -> printf("processing_packet checksum error!\n");
+            send_return_packet(2,0,0);
                 //serial_port->printf("checksum error\n");
                 return false;
         }
@@ -103,13 +117,16 @@ bool prism_connect::processing_packet(){
                       serial_port->printf("read  reg [%d] = %f , ",i+serial_buf[4], read_float_reg(i+serial_buf[4]));
                    }*/
                 if(reg_update != NULL){
+                  if(debug != NULL)debug -> printf("got packet!\n");
                   reg_update();
+
                   if(led_status != NULL){
                     led_status->write(1);
-                    led_status_timeout.  attach(callback(this,&prism_connect::led_status_off),0.1);
+                    led_status_timeout. attach(callback(this,&prism_connect::led_status_off),0.1);
 
 
                   }
+
                 }
                 send_return_packet(0,serial_buf[4],serial_buf[5]);
 
