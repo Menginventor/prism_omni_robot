@@ -91,7 +91,7 @@ mat state_dot(mat& _crr_state){
         R.set_to_Rz(_crr_state.mat_data[2][0]);
 
         crr_state_dot = (R*mat_omni_inv)*(wheel_speed*robot_wheel_r);
-        crr_state_dot.print();
+        //crr_state_dot.print();
         return crr_state_dot;
 }
 
@@ -109,19 +109,14 @@ void state_update(){
       omega.mat_data[0][0] = omega1;
       omega.mat_data[1][0] = omega2;
       omega.mat_data[2][0] = omega3;
-    //  pc.printf("omega = %f,%f,%f\n",omega1,omega2,omega3);
+      //pc.printf("omega = %f,%f,%f\n",omega1,omega2,omega3);
       wheel1_encoder.pos = 0;
       wheel2_encoder.pos = 0;
       wheel3_encoder.pos = 0;
 
-      debug_timer.reset();
-      debug_timer.start();
+
       static mat omni = omni_mat_init();
-/*
-      float crr_x = prism_comport.read_float_reg(1);
-      float crr_y = prism_comport.read_float_reg(5);
-      float crr_h = prism_comport.read_float_reg(9);
-*/
+
 
       float goal_x = prism_comport.read_float_reg(13);
       float goal_y = prism_comport.read_float_reg(17);
@@ -133,27 +128,20 @@ void state_update(){
       float head_error = goal_h - crr_state.mat_data[2][0];
       while(head_error >M_PI)head_error -= 2*M_PI;
       while(head_error < -M_PI)head_error += 2*M_PI;
-      /*
-      state_error.mat_data[0][0] = constrain(10.0*(goal_x - crr_x),200,-200);
-      state_error.mat_data[1][0] = constrain(10.0*(goal_y - crr_y),200,-200);
-      state_error.mat_data[2][0] = constrain(2*(head_error),2,-2);
-      */
       state_error.mat_data[0][0] = (goal_x - crr_state.mat_data[0][0]);
       state_error.mat_data[1][0] = (goal_y - crr_state.mat_data[1][0]);
       state_error.mat_data[2][0] = (head_error);
-      //pc.printf("head_error %f\t%d\n",head_error,checkmode);
-
+      //pc.printf("%f\n",head_error );
+//pc.printf("%f\n",state_error.mat_data[0][0] );
       static mat state_output(3,1);
-      state_output.mat_data[0][0] = constrain(0.0*state_error.mat_data[0][0],0.8,-0.8);
-      state_output.mat_data[1][0] = constrain(0.0*state_error.mat_data[1][0],0.8,-0.8);
-      state_output.mat_data[2][0] = constrain(1*state_error.mat_data[2][0],100,-100);
+      state_output.mat_data[0][0] = constrain(10.0*state_error.mat_data[0][0],0.8,-0.8);
+      state_output.mat_data[1][0] = constrain(10.0*state_error.mat_data[1][0],0.8,-0.8);
+      state_output.mat_data[2][0] = constrain(50.0*state_error.mat_data[2][0],100,-100);
 
       R.set_to_Rz(-crr_state.mat_data[2][0]);
 
       wheel_speed = (omni*R)*state_output;
-      //wheel_speed.mat_data[0][0] = 0.5;
-      //wheel_speed.mat_data[1][0] = 0.5;
-      //wheel_speed.mat_data[2][0] = 0.5;
+
       if(checkmode == 1){
           wheel1.write(wheel_speed.mat_data[0][0]);
           wheel2.write(wheel_speed.mat_data[1][0]);
@@ -168,18 +156,12 @@ void state_update(){
       prism_comport.write_float_reg(p2_addr,omega.mat_data[1][0]);   //p2
       prism_comport.write_float_reg(p3_addr,omega.mat_data[2][0]);   //p3
 
-/*
-      prism_comport.write_float_reg(p1_addr,4.0);   //p1
-      prism_comport.write_float_reg(p2_addr,0.0);   //p2
-      prism_comport.write_float_reg(p3_addr,-4.0);   //p3
-*/
-      //crr_state = RK4(crr_state,&state_dot,float(0.01));//take 700 uS
+      crr_state = RK4(crr_state,&state_dot,float(0.01));//take 700 uS
       crr_state.mat_data[2][0] = atan2(sin(crr_state.mat_data[2][0]),cos(crr_state.mat_data[2][0]));
-      state_dot(crr_state);
-      //crr_state.print();
-      //crr_state = euler(crr_state,&state_dot,float(1.0/100.0));
-      //debug_port.printf("%d\n",debug_timer.read_us() );
+      //state_dot(crr_state).print( );
+
       check_requesting = true;
+
 }
 int main() {
         prism_comport.led_status = &LED;
@@ -188,12 +170,12 @@ int main() {
 
         debug_port.baud(115200);
         debug_port.printf("Hello debug_port\n");
-        prism_comport.write_float_reg(goal_h_addr,M_PI/2);
+
+        //prism_comport.write_float_reg(goal_h_addr,M_PI/2);
+        prism_comport.write_float_reg(goal_x_addr,1);
 
         display_timer.attach(&display,0.5);
-        prism_comport.write_float_reg(p1_addr,100.0);
-        prism_comport.write_float_reg(p2_addr,0.0);
-        prism_comport.write_float_reg(p3_addr,-95.0);
+
         state_update_timer.attach(&state_update,0.01);
         mat_init();
 
